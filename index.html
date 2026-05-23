@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>God in Your Boat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal-deep:   #1a8a8a;
+      --teal-mid:    #2ab5b5;
+      --teal-light:  #5dd5d5;
+      --teal-pale:   #a8e8e8;
+      --lotus-pink:  #f472b6;
+      --lotus-deep:  #d946a8;
+      --lotus-gold:  #fbbf24;
+      --leaf-green:  #22c55e;
+      --leaf-dark:   #15803d;
+      --text-dark:   #1a2e1a;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Georgia', serif;
+    }
+
+    /* ── Water background ── */
+    body {
+      background: linear-gradient(160deg, var(--teal-light) 0%, var(--teal-mid) 40%, var(--teal-deep) 100%);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Shimmer overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(255,255,255,.06) 2px,
+        transparent 4px,
+        transparent 60px
+      );
+      animation: shimmer 6s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0 0; }
+      100% { background-position: 120px 0; }
+    }
+
+    /* ── Canvas for ripples ── */
+    #rippleCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Floating lily pads ── */
+    .lily-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .lily {
+      position: absolute;
+      border-radius: 50% 50% 50% 0;
+      opacity: .7;
+      animation: floatLeaf 8s ease-in-out infinite;
+    }
+    @keyframes floatLeaf {
+      0%,100% { transform: rotate(var(--rot)) translateY(0px) scale(1); }
+      50%      { transform: rotate(calc(var(--rot) + 6deg)) translateY(-12px) scale(1.04); }
+    }
+
+    /* ── Hero section ── */
+    .hero {
+      width: 100%;
+      max-width: 820px;
+      padding: 60px 24px 0;
+      text-align: center;
+    }
+
+    .quote-card {
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 28px;
+      padding: 44px 40px 36px;
+      box-shadow: 0 8px 48px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.4);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .quote-card:hover { transform: translateY(-4px); box-shadow: 0 16px 64px rgba(0,0,0,.22); }
+
+    .quote-card::before {
+      content: '\201C';
+      position: absolute;
+      top: -10px; left: 18px;
+      font-size: 130px;
+      color: rgba(255,255,255,.25);
+      font-family: Georgia, serif;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .quote-text {
+      font-size: clamp(1.25rem, 3vw, 1.65rem);
+      line-height: 1.65;
+      color: var(--text-dark);
+      font-weight: 500;
+      letter-spacing: .01em;
+      position: relative;
+      z-index: 1;
+    }
+    .quote-text em { font-style: normal; color: var(--leaf-dark); font-weight: 700; }
+
+    .quote-attr {
+      margin-top: 18px;
+      font-size: .85rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(30,60,30,.6);
+    }
+
+    /* ── Boat SVG scene ── */
+    .scene-wrap {
+      margin-top: 40px;
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: center;
+    }
+    .boat-svg {
+      width: 280px;
+      animation: boatRock 4s ease-in-out infinite;
+      filter: drop-shadow(0 12px 24px rgba(0,80,80,.35));
+    }
+    @keyframes boatRock {
+      0%,100% { transform: rotate(-3deg) translateY(0); }
+      50%      { transform: rotate(3deg) translateY(-10px); }
+    }
+
+    /* floating petals around boat */
+    .petal-orbit {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .petal {
+      position: absolute;
+      width: 18px; height: 26px;
+      border-radius: 50% 50% 50% 0;
+      background: radial-gradient(circle at 35% 35%, #fce4f0, var(--lotus-pink));
+      opacity: .85;
+      animation: orbitPetal var(--dur) linear infinite;
+      transform-origin: var(--ox) var(--oy);
+    }
+    @keyframes orbitPetal {
+      0%   { transform: rotate(var(--start)) translateX(var(--radius)) rotate(calc(-1*var(--start))); }
+      100% { transform: rotate(calc(var(--start) + 360deg)) translateX(var(--radius)) rotate(calc(-1*(var(--start)+360deg))); }
+    }
+
+    /* ── Storm / Calm toggle ── */
+    .controls {
+      margin-top: 36px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 12px 30px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.5);
+      background: rgba(255,255,255,.2);
+      backdrop-filter: blur(8px);
+      color: var(--text-dark);
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .25s, transform .15s, box-shadow .25s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
+    .btn:hover { background: rgba(255,255,255,.38); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+    .btn:active { transform: scale(.97); }
+    .btn.active { background: rgba(255,255,255,.55); border-color: white; }
+
+    /* ── Lotus pond section ── */
+    .pond-section {
+      margin-top: 52px;
+      width: 100%;
+      max-width: 820px;
+      padding: 0 24px;
+    }
+    .pond-title {
+      text-align: center;
+      font-size: 1rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: rgba(20,60,40,.65);
+      margin-bottom: 24px;
+    }
+    .pond {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .lotus-card {
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 20px;
+      padding: 24px 22px;
+      width: 220px;
+      text-align: center;
+      transition: transform .3s, box-shadow .3s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .lotus-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 16px 40px rgba(0,0,0,.2); }
+    .lotus-card .icon { font-size: 2.6rem; margin-bottom: 12px; display: block; animation: iconBob 3s ease-in-out infinite; }
+    @keyframes iconBob {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    .lotus-card h3 { font-size: 1rem; color: var(--text-dark); margin-bottom: 8px; }
+    .lotus-card p { font-size: .85rem; color: rgba(30,60,30,.75); line-height: 1.55; }
+
+    /* ── Fish trail ── */
+    .fish {
+      position: fixed;
+      font-size: 1.6rem;
+      pointer-events: none;
+      z-index: 3;
+      animation: fishSwim 18s linear infinite;
+      top: 15%;
+    }
+    @keyframes fishSwim {
+      0%   { left: -60px;  transform: scaleX(1)  translateY(0); opacity: 0; }
+      5%   { opacity: 1; }
+      45%  { transform: scaleX(1)  translateY(40px); }
+      50%  { left: 110vw; transform: scaleX(-1) translateY(40px); opacity: 1; }
+      55%  { opacity: 1; }
+      95%  { transform: scaleX(-1) translateY(0); }
+      99%  { left: -60px; opacity: 1; }
+      100% { left: -60px; opacity: 0; }
+    }
+
+    /* ── Storm overlay ── */
+    #stormOverlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity .8s;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(20,40,60,.65) 100%);
+    }
+    #stormOverlay.active { opacity: 1; }
+
+    .lightning {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 11;
+      opacity: 0;
+    }
+    .lightning.flash { animation: lightningFlash .15s ease-in-out; }
+    @keyframes lightningFlash {
+      0%,100% { opacity: 0; }
+      50%      { opacity: 1; background: rgba(255,255,220,.25); }
+    }
+
+    .rain-drop {
+      position: fixed;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(180,220,255,.7));
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 12;
+      animation: rainFall var(--rdur) linear infinite;
+      animation-delay: var(--rdel);
+    }
+    @keyframes rainFall {
+      0%   { transform: translateY(-40px) rotate(15deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: .8; }
+      100% { transform: translateY(110vh) rotate(15deg); opacity: 0; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 60px;
+      margin-bottom: 32px;
+      text-align: center;
+      font-size: .8rem;
+      color: rgba(20,60,40,.55);
+      letter-spacing: .06em;
+    }
+
+    /* ── Click ripple ── */
+    .click-ripple {
+      position: fixed;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.6);
+      pointer-events: none;
+      z-index: 20;
+      animation: rippleOut .8s ease-out forwards;
+    }
+    @keyframes rippleOut {
+      0%   { width: 0;    height: 0;    opacity: 1;  margin: 0; }
+      100% { width: 160px; height: 160px; opacity: 0; margin: -80px; }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.35); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- Water ripple canvas -->
+<canvas id="rippleCanvas"></canvas>
+
+<!-- Storm overlay -->
+<div id="stormOverlay"></div>
+<div class="lightning" id="lightning"></div>
+
+<!-- Goldfish -->
+<div class="fish">🐟</div>
+
+<!-- Ambient lily pads (generated by JS) -->
+<div class="lily-layer" id="lilyLayer"></div>
+
+<div class="page">
+
+  <!-- ── Quote hero ── -->
+  <section class="hero">
+    <div class="quote-card" id="quoteCard">
+      <p class="quote-text">
+        having <em>God</em> in your boat doesn't mean you won't face any storms,<br>
+        it means <em>no storm</em> can sink your boat.
+      </p>
+      <p class="quote-attr">— Ayush Kalra</p>
+    </div>
+  </section>
+
+  <!-- ── Animated boat scene ── -->
+  <div class="scene-wrap">
+    <div class="petal-orbit" id="petalOrbit"></div>
+
+    <!-- Inline SVG boat viewed from above -->
+    <svg class="boat-svg" viewBox="0 0 200 340" xmlns="http://www.w3.org/2000/svg">
+      <!-- Water shadow -->
+      <ellipse cx="100" cy="320" rx="70" ry="14" fill="rgba(0,80,80,.3)" />
+      <!-- Boat hull -->
+      <path d="M100 10 C140 10, 170 90, 170 180 C170 270, 140 330, 100 335
+               C60 330, 30 270, 30 180 C30 90, 60 10, 100 10Z"
+            fill="#c08040" stroke="#8B5E20" stroke-width="3"/>
+      <!-- Wood grain -->
+      <path d="M80 30 C85 90,85 200,80 310" stroke="#a06830" stroke-width="1.5" fill="none" opacity=".5"/>
+      <path d="M100 20 C105 90,105 210,100 330" stroke="#a06830" stroke-width="1.5" fill="none" opacity=".5"/>
+      <path d="M120 30 C115 90,115 200,120 310" stroke="#a06830" stroke-width="1.5" fill="none" opacity=".5"/>
+      <!-- Lotus cluster (centre) -->
+      <g transform="translate(100,155)">
+        <!-- Petals -->
+        <ellipse rx="22" ry="12" fill="#f472b6" opacity=".9" transform="rotate(0) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#e879a8" opacity=".9" transform="rotate(45) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#f472b6" opacity=".9" transform="rotate(90) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#e879a8" opacity=".9" transform="rotate(135) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#f472b6" opacity=".9" transform="rotate(180) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#e879a8" opacity=".9" transform="rotate(225) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#f472b6" opacity=".9" transform="rotate(270) translate(0,-18)"/>
+        <ellipse rx="22" ry="12" fill="#e879a8" opacity=".9" transform="rotate(315) translate(0,-18)"/>
+        <!-- Centre -->
+        <circle r="16" fill="#fbbf24"/>
+        <circle r="9"  fill="#f59e0b"/>
+        <circle r="4"  fill="#fde68a"/>
+      </g>
+      <!-- Person sitting -->
+      <circle cx="100" cy="230" r="14" fill="#5b3a10"/>
+      <ellipse cx="100" cy="248" rx="18" ry="10" fill="#4a3060"/>
+      <!-- Paddle left -->
+      <line x1="68" y1="240" x2="28" y2="270" stroke="#8B5E20" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="24" cy="274" rx="10" ry="6" fill="#a07040" transform="rotate(-30,24,274)"/>
+      <!-- Paddle right -->
+      <line x1="132" y1="240" x2="172" y2="270" stroke="#8B5E20" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="176" cy="274" rx="10" ry="6" fill="#a07040" transform="rotate(30,176,274)"/>
+    </svg>
+  </div>
+
+  <!-- ── Interactive controls ── -->
+  <div class="controls">
+    <button class="btn" id="btnCalm" onclick="setCalm()">Calm Waters</button>
+    <button class="btn" id="btnStorm" onclick="setStorm()">Face the Storm</button>
+    <button class="btn" onclick="bloomLotus()">Bloom a Lotus</button>
+  </div>
+
+  <!-- ── Lotus wisdom cards ── -->
+  <section class="pond-section">
+    <p class="pond-title">Wisdom from the water</p>
+    <div class="pond">
+      <div class="lotus-card">
+        <span class="icon">⚓</span>
+        <h3>Anchored in Faith</h3>
+        <p>Even the wildest waves cannot move a boat whose anchor holds in the deep.</p>
+      </div>
+      <div class="lotus-card">
+        <span class="icon">🌸</span>
+        <h3>Bloom Through Mud</h3>
+        <p>The lotus rises through muddy water — beauty born from the hardest seasons.</p>
+      </div>
+      <div class="lotus-card">
+        <span class="icon">🌊</span>
+        <h3>Storms Pass</h3>
+        <p>No storm has ever lasted forever. Still waters always follow the waves.</p>
+      </div>
+      <div class="lotus-card">
+        <span class="icon">✨</span>
+        <h3>You Are Not Alone</h3>
+        <p>The One who calmed the sea is sailing right beside you in every moment.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Click anywhere on the water to create ripples &nbsp;·&nbsp;
+    Quote by Ayush Kalra
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   LILY PADS
+   ============================================================ */
+const lilyLayer = document.getElementById('lilyLayer');
+const lilyData = [
+  { w:90, h:80, t:'8%',  l:'3%',  color:'#22c55e', rot:'-20deg', delay:'0s' },
+  { w:70, h:60, t:'12%', l:'72%', color:'#16a34a', rot:'40deg',  delay:'1s' },
+  { w:110,h:95, t:'55%', l:'80%', color:'#15803d', rot:'-10deg', delay:'2s' },
+  { w:80, h:70, t:'75%', l:'5%',  color:'#22c55e', rot:'25deg',  delay:'0.5s'},
+  { w:60, h:55, t:'35%', l:'88%', color:'#4ade80', rot:'-35deg', delay:'3s' },
+  { w:95, h:85, t:'88%', l:'60%', color:'#16a34a', rot:'15deg',  delay:'1.5s'},
+  { w:55, h:50, t:'5%',  l:'45%', color:'#22c55e', rot:'55deg',  delay:'2.5s'},
+];
+lilyData.forEach(d => {
+  const div = document.createElement('div');
+  div.className = 'lily';
+  Object.assign(div.style, {
+    width: d.w+'px', height: d.h+'px',
+    top: d.t, left: d.l,
+    background: `radial-gradient(circle at 40% 40%, #86efac, ${d.color})`,
+    '--rot': d.rot,
+    animationDelay: d.delay,
+    animationDuration: (6 + Math.random()*4)+'s',
+  });
+  lilyLayer.appendChild(div);
+});
+
+/* ============================================================
+   ORBITING PETALS around boat
+   ============================================================ */
+const petalOrbit = document.getElementById('petalOrbit');
+[0,1,2,3,4].forEach(i => {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  const angle = (i / 5) * 360;
+  Object.assign(p.style, {
+    top: '50%', left: '50%',
+    '--start': angle+'deg',
+    '--radius': (90 + i*12)+'px',
+    '--ox': '50%', '--oy': '50%',
+    '--dur': (6 + i*1.4)+'s',
+    animationDelay: (i * -1.2)+'s',
+  });
+  petalOrbit.appendChild(p);
+});
+
+/* ============================================================
+   RIPPLE CANVAS — click or tap
+   ============================================================ */
+const canvas = document.getElementById('rippleCanvas');
+const ctx = canvas.getContext('2d');
+let ripples = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function addRipple(x, y) {
+  ripples.push({ x, y, r: 0, maxR: 90 + Math.random()*60, alpha: .6 });
+}
+
+function drawRipples() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ripples = ripples.filter(r => r.alpha > 0.01);
+  ripples.forEach(r => {
+    r.r     += 2.2;
+    r.alpha *= 0.96;
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,255,255,${r.alpha})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (r.r < r.maxR * 0.6) {
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.r * 0.55, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,255,255,${r.alpha * 0.5})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  });
+  requestAnimationFrame(drawRipples);
+}
+drawRipples();
+
+document.addEventListener('click', e => {
+  addRipple(e.clientX, e.clientY);
+  addRipple(e.clientX + 12, e.clientY + 8);
+});
+
+/* ============================================================
+   STORM / CALM
+   ============================================================ */
+let stormActive   = false;
+let rainDrops     = [];
+let lightningTimer= null;
+
+const stormOverlay = document.getElementById('stormOverlay');
+const lightning    = document.getElementById('lightning');
+const boatSvg      = document.querySelector('.boat-svg');
+
+function setStorm() {
+  if (stormActive) return;
+  stormActive = true;
+  document.getElementById('btnStorm').classList.add('active');
+  document.getElementById('btnCalm').classList.remove('active');
+
+  stormOverlay.classList.add('active');
+  boatSvg.style.animationDuration = '1.2s';
+
+  // Rain
+  for (let i = 0; i < 60; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'rain-drop';
+    const h = 40 + Math.random() * 60;
+    Object.assign(drop.style, {
+      left: Math.random() * 110 + 'vw',
+      height: h + 'px',
+      '--rdur': (.4 + Math.random() * .5) + 's',
+      '--rdel': (-Math.random() * 1.5) + 's',
+    });
+    document.body.appendChild(drop);
+    rainDrops.push(drop);
+  }
+
+  // Random lightning
+  lightningTimer = setInterval(() => {
+    lightning.classList.remove('flash');
+    void lightning.offsetWidth; // reflow
+    lightning.classList.add('flash');
+
+    // storm ripples
+    for (let j = 0; j < 5; j++) {
+      setTimeout(() => {
+        addRipple(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+      }, j * 120);
+    }
+
+    // shake quote card
+    const card = document.getElementById('quoteCard');
+    card.style.animation = 'shake .4s ease';
+    setTimeout(() => card.style.animation = '', 420);
+  }, 2200 + Math.random() * 1800);
+}
+
+function setCalm() {
+  if (!stormActive) return;
+  stormActive = false;
+  document.getElementById('btnCalm').classList.add('active');
+  document.getElementById('btnStorm').classList.remove('active');
+
+  stormOverlay.classList.remove('active');
+  boatSvg.style.animationDuration = '4s';
+
+  rainDrops.forEach(d => d.remove());
+  rainDrops = [];
+  clearInterval(lightningTimer);
+
+  // gentle ripple burst
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      addRipple(window.innerWidth/2 + (Math.random()-0.5)*200,
+                window.innerHeight/2 + (Math.random()-0.5)*200);
+    }, i * 80);
+  }
+}
+
+/* Shake keyframe injection */
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px) rotate(-.5deg); }
+    40%     { transform: translateX(6px)  rotate(.5deg); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+`;
+document.head.appendChild(shakeStyle);
+
+/* ============================================================
+   BLOOM A LOTUS — drops a floating lotus onto the page
+   ============================================================ */
+function bloomLotus() {
+  const x = 80 + Math.random() * (window.innerWidth - 160);
+  const y = 80 + Math.random() * (window.innerHeight - 160);
+
+  const lotus = document.createElement('div');
+  lotus.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y}px;
+    font-size: ${28 + Math.random()*18}px;
+    pointer-events: none;
+    z-index: 30;
+    animation: bloomIn 3.5s ease-out forwards;
+    transform-origin: center;
+  `;
+  lotus.textContent = '🪷';
+  document.body.appendChild(lotus);
+
+  const bloomAnim = document.createElement('style');
+  bloomAnim.textContent = `
+    @keyframes bloomIn {
+      0%   { opacity:0; transform: scale(0) rotate(-30deg); }
+      30%  { opacity:1; transform: scale(1.3) rotate(10deg); }
+      60%  { transform: scale(1) rotate(-5deg); }
+      85%  { opacity:1; transform: scale(1) translateY(-30px); }
+      100% { opacity:0; transform: scale(.8) translateY(-60px); }
+    }
+  `;
+  document.head.appendChild(bloomAnim);
+
+  // ripple at that spot
+  addRipple(x, y);
+  setTimeout(() => { lotus.remove(); bloomAnim.remove(); }, 3600);
+}
+
+/* ============================================================
+   AUTO gentle ripples
+   ============================================================ */
+setInterval(() => {
+  if (!stormActive) {
+    addRipple(
+      Math.random() * window.innerWidth,
+      Math.random() * window.innerHeight
+    );
+  }
+}, 1800);
+
+/* initial calm state */
+document.getElementById('btnCalm').classList.add('active');
+</script>
+</body>
+</html>
