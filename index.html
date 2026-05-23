@@ -1,795 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>God in Your Boat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep:    #021818;
-      --bg-mid:     #042e2e;
-      --bg-surface: #0a4a4a;
-      --gold:       #c8a84b;
-      --gold-lt:    #dfc278;
-      --gold-pale:  rgba(200,168,75,0.1);
-      --lotus-a:    #c05070;
-      --lotus-b:    #f0a0be;
-      --lotus-c:    #fde0ea;
-      --cream:      #f0e8d8;
-      --cream-60:   rgba(240,232,216,0.6);
-      --cream-30:   rgba(240,232,216,0.3);
-      --serif:      'Cormorant Garamond', Georgia, serif;
-      --display:    'Cinzel', 'Palatino Linotype', serif;
+      --bg1:#011616; --bg2:#042a2a; --bg3:#0a4848;
+      --gold:#c8a84b; --glt:#dfc278;
+      --ld:#b03858; --lm:#e07898; --ll:#fde0ea;
+      --cr:#f0e8d8; --cr6:rgba(240,232,216,.6); --cr3:rgba(240,232,216,.3);
+      --s:'Cormorant Garamond',Georgia,serif;
+      --d:'Cinzel','Palatino Linotype',serif;
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg1);color:var(--cr);font-family:var(--s);overflow-x:hidden;cursor:none}
+    .cur,.cur-r{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+    .cur{width:8px;height:8px;background:var(--gold);mix-blend-mode:screen}
+    .cur-r{width:32px;height:32px;border:1px solid rgba(200,168,75,.45)}
+    @media(hover:none){.cur,.cur-r{display:none}body{cursor:auto}}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg-deep);
-      color: var(--cream);
-      font-family: var(--serif);
-      overflow-x: hidden;
+    /* ── Header ── */
+    .hdr{
+      position:fixed;top:0;left:0;right:0;z-index:100;height:58px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 clamp(20px,5vw,60px);
+      background:rgba(1,22,22,.65);backdrop-filter:blur(22px) saturate(1.4);
+      border-bottom:1px solid rgba(200,168,75,.09);
+      opacity:0;transform:translateY(-100%);transition:opacity .5s,transform .5s;
     }
+    .hdr.vis{opacity:1;transform:translateY(0)}
+    .hdr-logo{display:flex;align-items:center;gap:10px}
+    .hdr-logo span{font-family:var(--d);font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+    .hdr-nav{display:flex;gap:30px}
+    .hdr-nav a{font-family:var(--d);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cr3);text-decoration:none;transition:color .25s}
+    .hdr-nav a:hover{color:var(--gold)}
+    @media(max-width:520px){.hdr-nav{display:none}}
 
-    /* ── Cursor ── */
-    .cur { position:fixed;width:7px;height:7px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:opacity .2s; }
-    .cur-ring { position:fixed;width:34px;height:34px;border-radius:50%;border:1px solid rgba(200,168,75,.45);pointer-events:none;z-index:9998;transform:translate(-50%,-50%); }
-    @media (hover:none) { .cur,.cur-ring{display:none} }
+    /* ── Hero ── */
+    .hero{
+      position:relative;height:100vh;min-height:580px;
+      display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(ellipse 90% 90% at 50% 60%,#0d5252 0%,#042828 55%,var(--bg1) 100%);
+      overflow:hidden;
+    }
+    #hc{position:absolute;inset:0;pointer-events:none}
+    .hero-in{position:relative;z-index:2;text-align:center;padding:0 clamp(28px,8vw,100px);max-width:860px;will-change:transform}
+    .eyebrow{font-family:var(--d);font-size:clamp(.56rem,1vw,.7rem);letter-spacing:.38em;text-transform:uppercase;color:var(--gold);opacity:0;animation:up 1s ease .5s both}
+    .hq{margin-top:28px;font-size:clamp(1.85rem,4.4vw,4rem);font-weight:300;font-style:italic;line-height:1.5;color:var(--cr)}
+    .ql{display:block;opacity:0;transform:translateY(16px);animation:up .9s ease var(--dl) both}
+    .hq mark{color:var(--glt);background:transparent;font-weight:400;font-style:italic}
+    .hq strong{color:#fff;font-weight:400;font-style:italic}
+    .rule{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:32px auto;opacity:0;animation:up 1s ease 2s both}
+    .attr{font-family:var(--d);font-size:clamp(.56rem,.9vw,.68rem);letter-spacing:.25em;text-transform:uppercase;color:var(--cr6);opacity:0;animation:up 1s ease 2.2s both}
+    .scrl{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:up 1s ease 2.6s both}
+    .scrl span{font-family:var(--d);font-size:.54rem;letter-spacing:.3em;text-transform:uppercase;color:var(--cr3)}
+    .chev{width:12px;height:12px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:bob 2s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:rotate(45deg) translateY(0);opacity:.35}50%{transform:rotate(45deg) translateY(6px);opacity:1}}
+    @keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ════════════════════════════════════════
-       HERO
-    ════════════════════════════════════════ */
-    .hero {
-      position: relative;
-      height: 100vh;
-      min-height: 580px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(ellipse 90% 90% at 50% 65%, #0d5252 0%, #042a2a 55%, var(--bg-deep) 100%);
-      overflow: hidden;
+    /* ── Boat ── */
+    .boat-sec{
+      height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;
+      background:radial-gradient(ellipse 110% 90% at 50% 50%,#105858 0%,#042e2e 70%,var(--bg1) 100%);
     }
+    .boat-lbl{font-family:var(--d);font-size:clamp(.56rem,.95vw,.68rem);letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+    #bc{
+      width:min(260px,54vw);display:block;
+      filter:drop-shadow(0 28px 55px rgba(0,0,0,.68)) drop-shadow(0 6px 18px rgba(0,80,60,.45));
+    }
+    .boat-cap{font-size:clamp(.92rem,1.6vw,1.18rem);font-weight:300;font-style:italic;color:var(--cr6);text-align:center;max-width:310px;line-height:1.82}
 
-    #heroCanvas {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
+    /* ── Truths ── */
+    .truths-sec{
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:80px 24px;gap:50px;
+      background:linear-gradient(180deg,var(--bg2) 0%,var(--bg1) 100%);
     }
+    .sec-lbl{font-family:var(--d);font-size:clamp(.56rem,.95vw,.68rem);letter-spacing:.38em;text-transform:uppercase;color:var(--gold)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;width:100%;max-width:920px}
+    .card{
+      border:1px solid rgba(200,168,75,.11);border-radius:1px;
+      padding:40px 28px;position:relative;overflow:hidden;
+      background:rgba(255,255,255,.02);
+      opacity:0;transform:translateY(30px);
+      transition:opacity .7s ease,transform .7s ease,box-shadow .3s;
+    }
+    .card.vis{opacity:1;transform:translateY(0)}
+    .card::before{content:'';position:absolute;top:0;left:0;width:1px;height:0;background:linear-gradient(to bottom,transparent,var(--gold) 50%,transparent);transition:height .7s ease .25s}
+    .card.vis::before{height:100%}
+    .card:hover{box-shadow:0 18px 50px rgba(0,0,0,.42),inset 0 0 0 1px rgba(200,168,75,.18);transform:translateY(-4px)!important}
+    .cn{font-family:var(--d);font-size:.57rem;letter-spacing:.22em;color:var(--gold);display:block;margin-bottom:18px}
+    .ct{font-size:clamp(1.2rem,1.8vw,1.5rem);font-weight:400;color:var(--cr);margin-bottom:12px;line-height:1.3}
+    .cb{font-size:clamp(.86rem,1.15vw,.95rem);font-weight:300;font-style:italic;color:var(--cr6);line-height:1.88}
 
-    .hero-inner {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      padding: 0 clamp(28px, 8vw, 100px);
-      max-width: 860px;
-    }
+    /* ── Storm ── */
+    .storm-sec{height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg1);position:relative;overflow:hidden}
+    #sc{position:absolute;inset:0;pointer-events:none}
+    .storm-in{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;gap:32px;padding:0 28px}
+    .sh{font-size:clamp(1.2rem,2.5vw,1.85rem);font-weight:300;font-style:italic;color:var(--cr);line-height:1.65;max-width:450px;min-height:76px}
+    .sh .g{color:var(--glt)}
+    .tog-row{display:flex;align-items:center;gap:16px}
+    .tog-lbl{font-family:var(--d);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cr3);transition:color .3s}
+    .tog-lbl.on{color:var(--gold)}
+    .tog{width:54px;height:27px;border-radius:27px;border:1px solid rgba(200,168,75,.28);background:rgba(255,255,255,.04);position:relative;cursor:pointer;transition:background .4s,border-color .4s}
+    .tog.s{background:rgba(25,45,85,.55);border-color:rgba(80,120,200,.3)}
+    .tk{position:absolute;width:19px;height:19px;border-radius:50%;background:var(--gold);top:3px;left:4px;transition:left .4s cubic-bezier(.22,1,.36,1),background .4s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+    .tog.s .tk{left:30px;background:#7090c0}
+    .sm{font-size:clamp(.86rem,1.35vw,.98rem);font-weight:300;font-style:italic;color:var(--cr6);max-width:340px;line-height:1.88;min-height:50px}
 
-    .eyebrow {
-      font-family: var(--display);
-      font-size: clamp(.58rem, 1.1vw, .72rem);
-      letter-spacing: .35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0;
-      animation: fadeUp 1s ease .6s forwards;
+    /* ── Closing ── */
+    .closing{
+      min-height:50vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:20px;text-align:center;padding:60px 28px;
+      background:radial-gradient(ellipse 65% 65% at 50% 50%,#0a3e3e 0%,var(--bg1) 100%);
     }
-
-    .hero-quote {
-      margin-top: 32px;
-      font-size: clamp(2rem, 4.8vw, 4.4rem);
-      font-weight: 300;
-      font-style: italic;
-      line-height: 1.45;
-      color: var(--cream);
-      opacity: 0;
-      animation: fadeUp 1.2s ease .95s forwards;
-    }
-    .hero-quote .g  { color: var(--gold-lt); font-weight: 400; }
-    .hero-quote .w  { color: #fff; font-weight: 400; }
-
-    .rule {
-      width: 1px;
-      height: 52px;
-      background: linear-gradient(to bottom, transparent, var(--gold) 50%, transparent);
-      margin: 36px auto;
-      opacity: 0;
-      animation: fadeUp 1s ease 1.5s forwards;
-    }
-
-    .attr {
-      font-family: var(--display);
-      font-size: clamp(.58rem,.95vw,.7rem);
-      letter-spacing: .25em;
-      text-transform: uppercase;
-      color: var(--cream-60);
-      opacity: 0;
-      animation: fadeUp 1s ease 1.7s forwards;
-    }
-
-    .scroll-cue {
-      position: absolute;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      opacity: 0;
-      animation: fadeUp 1s ease 2.2s forwards;
-    }
-    .scroll-cue span {
-      font-family: var(--display);
-      font-size: .56rem;
-      letter-spacing: .3em;
-      text-transform: uppercase;
-      color: var(--cream-30);
-    }
-    .chevron {
-      width: 14px; height: 14px;
-      border-right: 1px solid var(--gold);
-      border-bottom: 1px solid var(--gold);
-      transform: rotate(45deg);
-      animation: bounce 2s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%,100%{transform:rotate(45deg) translateY(0);opacity:.4}
-      50%{transform:rotate(45deg) translateY(7px);opacity:1}
-    }
-
-    @keyframes fadeUp {
-      from{opacity:0;transform:translateY(22px)}
-      to{opacity:1;transform:translateY(0)}
-    }
-
-    /* ════════════════════════════════════════
-       BOAT SECTION
-    ════════════════════════════════════════ */
-    .boat-sec {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 36px;
-      background: radial-gradient(ellipse 110% 90% at 50% 50%, #105858 0%, #042e2e 70%, var(--bg-deep) 100%);
-      overflow: hidden;
-    }
-
-    .boat-svg {
-      width: min(320px, 62vw);
-      filter: drop-shadow(0 28px 55px rgba(0,0,0,.6)) drop-shadow(0 4px 12px rgba(0,80,80,.5));
-      animation: rock 6s ease-in-out infinite;
-    }
-    @keyframes rock {
-      0%,100%{transform:rotate(-2.5deg) translateY(0)}
-      50%{transform:rotate(2.5deg) translateY(-14px)}
-    }
-
-    .boat-caption {
-      font-size: clamp(1rem,1.8vw,1.25rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream-60);
-      text-align: center;
-      max-width: 340px;
-      line-height: 1.75;
-    }
-
-    /* ════════════════════════════════════════
-       TRUTHS
-    ════════════════════════════════════════ */
-    .truths-sec {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 24px;
-      gap: 56px;
-      background: linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
-    }
-
-    .sec-label {
-      font-family: var(--display);
-      font-size: clamp(.58rem,1vw,.7rem);
-      letter-spacing: .35em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 920px;
-    }
-
-    .card {
-      border: 1px solid rgba(200,168,75,.13);
-      border-radius: 2px;
-      padding: 44px 32px;
-      position: relative;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(36px);
-      transition: opacity .7s ease, transform .7s ease, box-shadow .35s;
-    }
-    .card.vis { opacity: 1; transform: translateY(0); }
-    .card:hover { box-shadow: 0 18px 55px rgba(0,0,0,.45), inset 0 0 0 1px rgba(200,168,75,.22); }
-
-    /* gold left accent bar */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 1px; height: 0;
-      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
-      transition: height .7s ease .25s;
-    }
-    .card.vis::before { height: 100%; }
-
-    .card-num {
-      font-family: var(--display);
-      font-size: .58rem;
-      letter-spacing: .25em;
-      color: var(--gold);
-      display: block;
-      margin-bottom: 22px;
-    }
-
-    .card-title {
-      font-size: clamp(1.3rem,2vw,1.65rem);
-      font-weight: 400;
-      color: var(--cream);
-      margin-bottom: 14px;
-      line-height: 1.3;
-    }
-
-    .card-body {
-      font-size: clamp(.88rem,1.2vw,.98rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream-60);
-      line-height: 1.85;
-    }
-
-    /* ════════════════════════════════════════
-       STORM SECTION
-    ════════════════════════════════════════ */
-    .storm-sec {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-deep);
-      overflow: hidden;
-    }
-
-    #stormCanvas {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    .storm-inner {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 36px;
-      padding: 0 28px;
-    }
-
-    .storm-heading {
-      font-size: clamp(1.3rem,2.8vw,2rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream);
-      line-height: 1.6;
-      max-width: 480px;
-      min-height: 80px;
-      transition: color .6s;
-    }
-    .storm-heading .g { color: var(--gold-lt); }
-
-    /* Toggle */
-    .tog-row { display:flex;align-items:center;gap:18px; }
-    .tog-lbl {
-      font-family: var(--display);
-      font-size: .62rem;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--cream-30);
-      transition: color .35s;
-    }
-    .tog-lbl.on { color: var(--gold); }
-
-    .tog {
-      width: 56px; height: 28px;
-      border-radius: 28px;
-      border: 1px solid rgba(200,168,75,.3);
-      background: rgba(255,255,255,.04);
-      position: relative;
-      cursor: pointer;
-      transition: background .4s, border-color .4s;
-    }
-    .tog.stormy { background: rgba(30,50,90,.55); border-color: rgba(80,120,200,.35); }
-
-    .tog-knob {
-      position: absolute;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: var(--gold);
-      top: 3px; left: 4px;
-      transition: left .4s cubic-bezier(.22,1,.36,1), background .4s;
-      box-shadow: 0 2px 8px rgba(0,0,0,.3);
-    }
-    .tog.stormy .tog-knob { left: 32px; background: #7090c0; }
-
-    .storm-msg {
-      font-size: clamp(.9rem,1.5vw,1.05rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream-60);
-      max-width: 360px;
-      line-height: 1.8;
-      min-height: 56px;
-      transition: color .5s;
-    }
-
-    /* ════════════════════════════════════════
-       CLOSING
-    ════════════════════════════════════════ */
-    .closing {
-      min-height: 55vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 22px;
-      text-align: center;
-      padding: 60px 28px;
-      background: radial-gradient(ellipse 70% 70% at 50% 50%, #0a4040 0%, var(--bg-deep) 100%);
-    }
-
-    .close-rule { width: 36px; height: 1px; background: rgba(200,168,75,.45); }
-
-    .close-text {
-      font-size: clamp(1.1rem,2.4vw,1.65rem);
-      font-weight: 300;
-      font-style: italic;
-      color: var(--cream-60);
-      line-height: 1.7;
-    }
-    .close-text .g { color: var(--gold-lt); }
-
-    .close-attr {
-      font-family: var(--display);
-      font-size: .58rem;
-      letter-spacing: .3em;
-      text-transform: uppercase;
-      color: rgba(200,168,75,.4);
-    }
-
-    /* ── Flash keyframe (injected) ── */
-    @keyframes flashOut { 0%{opacity:1}100%{opacity:0} }
+    .c-rule{width:32px;height:1px;background:rgba(200,168,75,.38)}
+    .c-txt{font-size:clamp(1.05rem,2.2vw,1.55rem);font-weight:300;font-style:italic;color:var(--cr6);line-height:1.72}
+    .c-txt .g{color:var(--glt)}
+    .c-attr{font-family:var(--d);font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,168,75,.35)}
+    @keyframes flashOut{0%{opacity:1}100%{opacity:0}}
   </style>
 </head>
 <body>
 
-<div class="cur"  id="cur"></div>
-<div class="cur-ring" id="curRing"></div>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
 
-<!-- ══ HERO ══ -->
-<section class="hero" id="heroSec">
-  <canvas id="heroCanvas"></canvas>
+<header class="hdr" id="hdr">
+  <div class="hdr-logo">
+    <svg width="22" height="22" viewBox="0 0 44 44">
+      <g transform="translate(22,22)">
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".9" transform="rotate(0) translate(0,-11)"/>
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".85" transform="rotate(60) translate(0,-11)"/>
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".85" transform="rotate(120) translate(0,-11)"/>
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".85" transform="rotate(180) translate(0,-11)"/>
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".85" transform="rotate(240) translate(0,-11)"/>
+        <ellipse rx="10" ry="4.2" fill="#c8a84b" opacity=".85" transform="rotate(300) translate(0,-11)"/>
+        <circle r="5" fill="#dfc278"/>
+      </g>
+    </svg>
+    <span>God in Your Boat</span>
+  </div>
+  <nav class="hdr-nav">
+    <a href="#hero">Home</a>
+    <a href="#boat">The Boat</a>
+    <a href="#truths">Truths</a>
+    <a href="#journey">Journey</a>
+  </nav>
+</header>
 
-  <div class="hero-inner">
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <canvas id="hc"></canvas>
+  <div class="hero-in" id="heroIn">
     <p class="eyebrow">A Meditation on Faith</p>
-
-    <blockquote class="hero-quote">
-      having <span class="g">God</span> in your boat<br>
-      doesn't mean you won't face any storms,<br>
-      it means <span class="w">no storm</span> can<br>
-      sink your boat.
+    <blockquote class="hq">
+      <span class="ql" style="--dl:1.0s">having <mark>God</mark> in your boat</span>
+      <span class="ql" style="--dl:1.3s">doesn't mean you won't face any storms,</span>
+      <span class="ql" style="--dl:1.6s">it means <strong>no storm</strong> can</span>
+      <span class="ql" style="--dl:1.9s">sink your boat.</span>
     </blockquote>
-
     <div class="rule"></div>
     <p class="attr">— Ayush Kalra</p>
   </div>
-
-  <div class="scroll-cue">
-    <span>Scroll</span>
-    <div class="chevron"></div>
-  </div>
+  <div class="scrl"><span>Scroll</span><div class="chev"></div></div>
 </section>
 
-<!-- ══ BOAT ══ -->
-<section class="boat-sec">
-  <svg class="boat-svg" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="wG" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%"   stop-color="#7a4818"/>
-        <stop offset="30%"  stop-color="#9a6028"/>
-        <stop offset="50%"  stop-color="#b87838"/>
-        <stop offset="70%"  stop-color="#9a6028"/>
-        <stop offset="100%" stop-color="#7a4818"/>
-      </linearGradient>
-      <linearGradient id="wGi" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%"   stop-color="#8a5420"/>
-        <stop offset="50%"  stop-color="#a06830"/>
-        <stop offset="100%" stop-color="#8a5420"/>
-      </linearGradient>
-      <radialGradient id="pA" cx="35%" cy="30%" r="70%">
-        <stop offset="0%"   stop-color="#fde0ea"/>
-        <stop offset="55%"  stop-color="#e888a8"/>
-        <stop offset="100%" stop-color="#b84868"/>
-      </radialGradient>
-      <radialGradient id="pB" cx="35%" cy="30%" r="70%">
-        <stop offset="0%"   stop-color="#fff0f5"/>
-        <stop offset="55%"  stop-color="#f4a8c4"/>
-        <stop offset="100%" stop-color="#cc6888"/>
-      </radialGradient>
-      <radialGradient id="gld" cx="38%" cy="35%" r="65%">
-        <stop offset="0%"   stop-color="#fde68a"/>
-        <stop offset="100%" stop-color="#b8780a"/>
-      </radialGradient>
-      <radialGradient id="shad" cx="50%" cy="50%" r="50%">
-        <stop offset="0%"   stop-color="rgba(0,50,50,.55)"/>
-        <stop offset="100%" stop-color="rgba(0,50,50,0)"/>
-      </radialGradient>
-    </defs>
-
-    <!-- Shadow on water -->
-    <ellipse cx="150" cy="488" rx="95" ry="14" fill="url(#shad)"/>
-
-    <!-- Hull outer -->
-    <path d="M150 14 C210 14,252 112,252 250 C252 386,210 488,150 494 C90 488,48 386,48 250 C48 112,90 14,150 14Z"
-          fill="url(#wG)" stroke="#60380a" stroke-width="2.5"/>
-    <!-- Hull inner -->
-    <path d="M150 28 C204 28,238 122,238 250 C238 376,204 478,150 482 C96 478,62 376,62 250 C62 122,96 28,150 28Z"
-          fill="url(#wGi)"/>
-
-    <!-- Plank lines -->
-    <path d="M132 34 C130 180 130 320 128 474" stroke="#7a4010" stroke-width="1.2" fill="none" opacity=".55"/>
-    <path d="M150 22 C150 180 150 320 150 482" stroke="#7a4010" stroke-width="1.2" fill="none" opacity=".55"/>
-    <path d="M168 34 C170 180 170 320 172 474" stroke="#7a4010" stroke-width="1.2" fill="none" opacity=".55"/>
-    <path d="M114 54 C110 180 110 320 106 460" stroke="#7a4010" stroke-width=".8"  fill="none" opacity=".35"/>
-    <path d="M186 54 C190 180 190 320 194 460" stroke="#7a4010" stroke-width=".8"  fill="none" opacity=".35"/>
-
-    <!-- ── Main lotus (bottom) ── -->
-    <g transform="translate(150,390)">
-      <!-- outer 8 petals -->
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(0)   translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(45)  translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(90)  translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(135) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(180) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(225) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(270) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(315) translate(0,-26)"/>
-      <!-- inner 8 petals -->
-      <ellipse rx="20" ry="9"  fill="url(#pB)" transform="rotate(22)  translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pA)" transform="rotate(67)  translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pB)" transform="rotate(112) translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pA)" transform="rotate(157) translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pB)" transform="rotate(202) translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pA)" transform="rotate(247) translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pB)" transform="rotate(292) translate(0,-16)"/>
-      <ellipse rx="20" ry="9"  fill="url(#pA)" transform="rotate(337) translate(0,-16)"/>
-      <!-- centre -->
-      <circle r="20" fill="url(#gld)"/>
-      <circle r="11" fill="#c8880a" opacity=".7"/>
-      <circle r="5"  fill="#fde68a"/>
-    </g>
-
-    <!-- ── Small top lotus ── -->
-    <g transform="translate(150,118) scale(.68)">
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(0)   translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(45)  translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(90)  translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(135) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(180) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(225) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pB)" transform="rotate(270) translate(0,-26)"/>
-      <ellipse rx="30" ry="13" fill="url(#pA)" transform="rotate(315) translate(0,-26)"/>
-      <circle r="20" fill="url(#gld)"/>
-      <circle r="10" fill="#c8880a" opacity=".7"/>
-      <circle r="5"  fill="#fde68a"/>
-    </g>
-
-    <!-- Figure -->
-    <ellipse cx="150" cy="268" rx="24" ry="17" fill="#2c1858" opacity=".95"/>
-    <circle  cx="150" cy="248" r="19" fill="#4a2c0a"/>
-    <ellipse cx="150" cy="246" rx="23" ry="8"  fill="#2a1605"/>
-
-    <!-- Paddles -->
-    <line x1="112" y1="272" x2="46"  y2="316" stroke="#6a3808" stroke-width="5.5" stroke-linecap="round"/>
-    <ellipse cx="38" cy="322" rx="20" ry="7.5" fill="#7a4818" transform="rotate(-34,38,322)"/>
-    <line x1="188" y1="272" x2="254" y2="316" stroke="#6a3808" stroke-width="5.5" stroke-linecap="round"/>
-    <ellipse cx="262" cy="322" rx="20" ry="7.5" fill="#7a4818" transform="rotate(34,262,322)"/>
-  </svg>
-
-  <p class="boat-caption">
-    Trusting the hands that hold the waters,<br>
-    even through the deepest storms.
-  </p>
+<!-- ── BOAT ── -->
+<section class="boat-sec" id="boat">
+  <p class="boat-lbl">Carried on Still Waters</p>
+  <canvas id="bc"></canvas>
+  <p class="boat-cap">Trusting the hands that hold the waters,<br>even through the deepest storms.</p>
 </section>
 
-<!-- ══ TRUTHS ══ -->
-<section class="truths-sec">
-  <p class="sec-label">Three Timeless Truths</p>
+<!-- ── TRUTHS ── -->
+<section class="truths-sec" id="truths">
+  <p class="sec-lbl">Three Timeless Truths</p>
   <div class="grid">
     <div class="card">
-      <span class="card-num">01</span>
-      <h3 class="card-title">Anchored<br>in Faith</h3>
-      <p class="card-body">The anchor holds not in calm, but in the storm. Faith is not the absence of waves — it is the certainty that what carries you cannot sink.</p>
+      <span class="cn">01</span>
+      <h3 class="ct">Anchored<br>in Faith</h3>
+      <p class="cb">The anchor holds not in calm, but in the storm. Faith is not the absence of waves — it is the certainty that what carries you cannot sink.</p>
     </div>
-    <div class="card" style="transition-delay:.12s">
-      <span class="card-num">02</span>
-      <h3 class="card-title">Storms<br>Will Come</h3>
-      <p class="card-body">No promise was ever made of still waters. But every storm has a shore. The One who sent you on this journey knows exactly where you are.</p>
+    <div class="card" style="transition-delay:.15s">
+      <span class="cn">02</span>
+      <h3 class="ct">Storms<br>Will Come</h3>
+      <p class="cb">No promise was ever made of still waters. But every storm has a shore, and the One who sent you on this journey knows exactly where you are.</p>
     </div>
-    <div class="card" style="transition-delay:.24s">
-      <span class="card-num">03</span>
-      <h3 class="card-title">You Cannot<br>Be Sunk</h3>
-      <p class="card-body">The boat that carries <em>God</em> does not yield to storms. Not because the waves grow smaller, but because the hands that hold it are greater.</p>
+    <div class="card" style="transition-delay:.3s">
+      <span class="cn">03</span>
+      <h3 class="ct">You Cannot<br>Be Sunk</h3>
+      <p class="cb">The boat that carries <em>God</em> does not yield to storms. Not because the waves grow smaller, but because the hands that hold it are greater.</p>
     </div>
   </div>
 </section>
 
-<!-- ══ STORM EXPERIENCE ══ -->
-<section class="storm-sec">
-  <canvas id="stormCanvas"></canvas>
-
-  <div class="storm-inner">
-    <p class="sec-label">Experience the Journey</p>
-
-    <p class="storm-heading" id="sHead">
-      The waters are still.<br>
-      <span class="g">Your faith holds the anchor.</span>
-    </p>
-
+<!-- ── STORM ── -->
+<section class="storm-sec" id="journey">
+  <canvas id="sc"></canvas>
+  <div class="storm-in">
+    <p class="sec-lbl">Experience the Journey</p>
+    <p class="sh" id="sh">The waters are still.<br><span class="g">Your faith holds the anchor.</span></p>
     <div class="tog-row">
-      <span class="tog-lbl on" id="lCalm">Calm</span>
-      <div class="tog" id="togEl" onclick="toggleWeather()">
-        <div class="tog-knob"></div>
-      </div>
-      <span class="tog-lbl" id="lStorm">Storm</span>
+      <span class="tog-lbl on" id="lC">Calm</span>
+      <div class="tog" id="tog" onclick="toggleW()"><div class="tk"></div></div>
+      <span class="tog-lbl" id="lS">Storm</span>
     </div>
-
-    <p class="storm-msg" id="sMsg">
-      Click the water to create ripples.
-    </p>
+    <p class="sm" id="sm">Click the water to create ripples.</p>
   </div>
 </section>
 
-<!-- ══ CLOSING ══ -->
+<!-- ── CLOSING ── -->
 <section class="closing">
-  <div class="close-rule"></div>
-  <p class="close-text">
-    May you always feel<br>
-    <span class="g">God</span> in your boat.
-  </p>
-  <div class="close-rule"></div>
-  <p class="close-attr">Inspired by Ayush Kalra</p>
+  <div class="c-rule"></div>
+  <p class="c-txt">May you always feel<br><span class="g">God</span> in your boat.</p>
+  <div class="c-rule"></div>
+  <p class="c-attr">Inspired by Ayush Kalra</p>
 </section>
 
 <script>
-/* ─── Custom cursor ─── */
-const cur = document.getElementById('cur');
-const crg = document.getElementById('curRing');
-let mx=window.innerWidth/2, my=window.innerHeight/2, rx=mx, ry=my;
-document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
-(function animCur(){
-  cur.style.cssText += `;left:${mx}px;top:${my}px`;
-  rx += (mx-rx)*.11; ry += (my-ry)*.11;
-  crg.style.cssText += `;left:${rx}px;top:${ry}px`;
-  requestAnimationFrame(animCur);
-})();
+/* ── Cursor ── */
+const $cur=document.getElementById('cur'),$curR=document.getElementById('curR')
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
+;(function aC(){
+  $cur.style.cssText+=`;left:${mx}px;top:${my}px`
+  rx+=(mx-rx)*.1;ry+=(my-ry)*.1
+  $curR.style.cssText+=`;left:${rx}px;top:${ry}px`
+  requestAnimationFrame(aC)
+})()
 
-/* ─── Hero canvas ─── */
-const hc  = document.getElementById('heroCanvas');
-const hx  = hc.getContext('2d');
-let hT=0, hRipples=[];
+/* ── Header ── */
+window.addEventListener('scroll',()=>document.getElementById('hdr').classList.toggle('vis',scrollY>80),{passive:true})
 
-const bands = Array.from({length:20}, ()=>({
-  y:    Math.random()*window.innerHeight,
-  vy:   .06+Math.random()*.1,
-  amp:  12+Math.random()*22,
-  freq: .007+Math.random()*.008,
-  ph:   Math.random()*Math.PI*2,
-  ph2:  Math.random()*Math.PI*2,
-  al:   .022+Math.random()*.038,
-}));
+/* ── Hero Canvas ── */
+const hc=document.getElementById('hc'),hx=hc.getContext('2d')
+let hT=0,hRip=[],hpx=0,hpy=0
 
-const petals = Array.from({length:28}, ()=>({
-  x:  Math.random()*window.innerWidth,
-  y:  Math.random()*window.innerHeight,
-  sz: 4+Math.random()*9,
-  rot:Math.random()*Math.PI*2,
-  rs: (Math.random()-.5)*.018,
-  vx: (Math.random()-.5)*.35,
-  vy: .18+Math.random()*.45,
-  al: .25+Math.random()*.55,
-  h:  325+Math.random()*40,
-}));
+const bands=Array.from({length:22},()=>({
+  y:Math.random()*innerHeight,vy:.055+Math.random()*.1,
+  amp:10+Math.random()*20,freq:.007+Math.random()*.007,
+  ph:Math.random()*Math.PI*2,ph2:Math.random()*Math.PI*2,
+  al:.018+Math.random()*.038
+}))
+const petals=Array.from({length:32},()=>({
+  x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+  sz:4+Math.random()*9,rot:Math.random()*Math.PI*2,
+  rs:(Math.random()-.5)*.016,vx:(Math.random()-.5)*.3,
+  vy:.16+Math.random()*.42,al:.22+Math.random()*.5,
+  h:322+Math.random()*42,lyr:.4+Math.random()*.6
+}))
 
-function resizeH(){hc.width=window.innerWidth;hc.height=window.innerHeight;}
-resizeH(); window.addEventListener('resize',resizeH);
+function resizeH(){hc.width=innerWidth;hc.height=innerHeight}
+resizeH();window.addEventListener('resize',resizeH)
+document.addEventListener('mousemove',e=>{hpx=(e.clientX/innerWidth-.5)*18;hpy=(e.clientY/innerHeight-.5)*10})
 
-function drawHero(){
-  hx.clearRect(0,0,hc.width,hc.height);
-
-  /* caustic shimmer */
+function heroLoop(){
+  hx.clearRect(0,0,hc.width,hc.height)
   bands.forEach(b=>{
-    const cy = b.y + Math.sin(hT*.005+b.ph)*b.amp + Math.sin(hT*.009+b.ph2)*(b.amp*.4);
-    const lg = hx.createLinearGradient(0,0,hc.width,0);
-    lg.addColorStop(0,'rgba(200,168,75,0)');
-    lg.addColorStop(.25,`rgba(200,168,75,${b.al})`);
-    lg.addColorStop(.5,`rgba(255,240,200,${b.al*1.7})`);
-    lg.addColorStop(.75,`rgba(200,168,75,${b.al})`);
-    lg.addColorStop(1,'rgba(200,168,75,0)');
-    hx.beginPath();
+    const cy=b.y+Math.sin(hT*.005+b.ph)*b.amp+Math.sin(hT*.009+b.ph2)*(b.amp*.38)+hpy*.8
+    const lg=hx.createLinearGradient(0,0,hc.width,0)
+    lg.addColorStop(0,'rgba(200,168,75,0)')
+    lg.addColorStop(.25,`rgba(200,168,75,${b.al})`)
+    lg.addColorStop(.5,`rgba(255,240,200,${b.al*1.8})`)
+    lg.addColorStop(.75,`rgba(200,168,75,${b.al})`)
+    lg.addColorStop(1,'rgba(200,168,75,0)')
+    hx.beginPath()
     for(let x=0;x<=hc.width;x+=3){
-      const y=cy+Math.sin(x*b.freq+hT*.004+b.ph)*3.5;
-      x===0?hx.moveTo(x,y):hx.lineTo(x,y);
+      const y=cy+Math.sin(x*b.freq+hT*.004+b.ph)*3.5
+      x===0?hx.moveTo(x,y):hx.lineTo(x,y)
     }
-    hx.strokeStyle=lg; hx.lineWidth=1+Math.sin(hT*.008+b.ph)*.7; hx.stroke();
-    b.y+=b.vy; if(b.y>hc.height+60) b.y=-60;
-  });
-
-  /* floating petals */
+    hx.strokeStyle=lg;hx.lineWidth=1+Math.sin(hT*.008+b.ph)*.65;hx.stroke()
+    b.y+=b.vy;if(b.y>hc.height+60)b.y=-60
+  })
   petals.forEach(p=>{
-    hx.save();
-    hx.translate(p.x,p.y); hx.rotate(p.rot); hx.globalAlpha=p.al;
-    const pg=hx.createRadialGradient(0,0,0,0,0,p.sz);
-    pg.addColorStop(0,`hsla(${p.h},75%,88%,1)`);
-    pg.addColorStop(.6,`hsla(${p.h},65%,65%,1)`);
-    pg.addColorStop(1,`hsla(${p.h},60%,50%,0)`);
-    hx.beginPath(); hx.ellipse(0,0,p.sz*.5,p.sz,0,0,Math.PI*2);
-    hx.fillStyle=pg; hx.fill(); hx.restore();
-    p.x+=p.vx+Math.sin(hT*.009+p.al*8)*.28; p.y+=p.vy; p.rot+=p.rs;
-    if(p.y>hc.height+16){p.y=-16;p.x=Math.random()*hc.width;}
-    if(p.x<-16)p.x=hc.width+16; if(p.x>hc.width+16)p.x=-16;
-  });
-
-  /* ripples */
-  hRipples=hRipples.filter(r=>r.a>.01);
-  hRipples.forEach(r=>{
-    hx.beginPath(); hx.arc(r.x,r.y,r.r,0,Math.PI*2);
-    hx.strokeStyle=`rgba(255,255,255,${r.a})`; hx.lineWidth=1.5; hx.stroke();
+    hx.save()
+    hx.translate(p.x+hpx*p.lyr,p.y+hpy*p.lyr)
+    hx.rotate(p.rot);hx.globalAlpha=p.al
+    const pg=hx.createRadialGradient(0,0,0,0,0,p.sz)
+    pg.addColorStop(0,`hsla(${p.h},75%,88%,1)`)
+    pg.addColorStop(.6,`hsla(${p.h},65%,65%,1)`)
+    pg.addColorStop(1,`hsla(${p.h},60%,50%,0)`)
+    hx.beginPath();hx.ellipse(0,0,p.sz*.46,p.sz,0,0,Math.PI*2)
+    hx.fillStyle=pg;hx.fill();hx.restore()
+    p.x+=p.vx+Math.sin(hT*.009+p.al*8)*.24;p.y+=p.vy;p.rot+=p.rs
+    if(p.y>hc.height+16){p.y=-16;p.x=Math.random()*hc.width}
+    if(p.x<-16)p.x=hc.width+16;if(p.x>hc.width+16)p.x=-16
+  })
+  hRip=hRip.filter(r=>r.a>.01)
+  hRip.forEach(r=>{
+    hx.beginPath();hx.arc(r.x,r.y,r.r,0,Math.PI*2)
+    hx.strokeStyle=`rgba(255,255,255,${r.a})`;hx.lineWidth=1.5;hx.stroke()
     if(r.r>20){
-      hx.beginPath(); hx.arc(r.x,r.y,r.r*.5,0,Math.PI*2);
-      hx.strokeStyle=`rgba(200,168,75,${r.a*.55})`; hx.lineWidth=1; hx.stroke();
+      hx.beginPath();hx.arc(r.x,r.y,r.r*.46,0,Math.PI*2)
+      hx.strokeStyle=`rgba(200,168,75,${r.a*.5})`;hx.lineWidth=1;hx.stroke()
     }
-    r.r+=1.8+r.r*.025; r.a*=.962;
-  });
-
-  hT++; requestAnimationFrame(drawHero);
+    r.r+=1.7+r.r*.02;r.a*=.963
+  })
+  document.getElementById('heroIn').style.transform=`translate(${hpx*.22}px,${hpy*.14}px)`
+  hT++;requestAnimationFrame(heroLoop)
 }
-drawHero();
+heroLoop()
+document.getElementById('hero').addEventListener('click',e=>{
+  for(let i=0;i<3;i++) setTimeout(()=>hRip.push({x:e.clientX,y:e.clientY,r:2+i*7,a:.6-i*.14}),i*55)
+})
+setInterval(()=>hRip.push({x:Math.random()*hc.width,y:Math.random()*hc.height,r:0,a:.18}),2800)
 
-document.getElementById('heroSec').addEventListener('click',e=>{
-  for(let i=0;i<3;i++) setTimeout(()=>hRipples.push({x:e.clientX,y:e.clientY,r:2+i*7,a:.65-i*.15}),i*55);
-});
-setInterval(()=>hRipples.push({x:Math.random()*hc.width,y:Math.random()*hc.height,r:0,a:.22}),2400);
+/* ══════════════════════════════════════════
+   BOAT CANVAS — fully bezier-rendered scene
+══════════════════════════════════════════ */
+const bc=document.getElementById('bc'),bx=bc.getContext('2d')
+const BW=320,BH=520
+bc.width=BW;bc.height=BH
+let bT=0
 
-/* ─── Scroll reveal: cards ─── */
-const io=new IntersectionObserver(entries=>entries.forEach(e=>{
-  if(e.isIntersecting) e.target.classList.add('vis');
-}),{threshold:.2});
-document.querySelectorAll('.card').forEach(c=>io.observe(c));
+function petal(cx,cy,angle,len,wid,a1,a2){
+  /* draws one teardrop lotus petal rotated to angle */
+  bx.save();bx.translate(cx,cy);bx.rotate(angle);bx.globalAlpha=1
+  const g=bx.createLinearGradient(0,0,0,len)
+  g.addColorStop(0,a1);g.addColorStop(.38,a2);g.addColorStop(1,'rgba(130,30,58,.88)')
+  bx.beginPath()
+  bx.moveTo(0,3)
+  bx.bezierCurveTo( wid,len*.27, wid*.88,len*.7, 0,len)
+  bx.bezierCurveTo(-wid*.88,len*.7,-wid,len*.27, 0,3)
+  bx.closePath();bx.fillStyle=g;bx.fill()
+  /* centre vein */
+  bx.beginPath();bx.moveTo(0,4);bx.lineTo(0,len*.87)
+  bx.strokeStyle='rgba(180,60,90,.2)';bx.lineWidth=.8;bx.stroke()
+  bx.restore()
+}
 
-/* ─── Storm canvas ─── */
-const sc=document.getElementById('stormCanvas');
-const sx=sc.getContext('2d');
-let sT=0, stormy=false, rain=[], sRipples=[];
+function lotus(cx,cy,R,phase){
+  const s=1+Math.sin(phase*.7)*.024   /* breathing scale */
+  /* glow */
+  const gw=bx.createRadialGradient(cx,cy,0,cx,cy,R*1.65*s)
+  gw.addColorStop(0,'rgba(255,185,130,.3)');gw.addColorStop(.5,'rgba(200,168,75,.1)');gw.addColorStop(1,'rgba(0,0,0,0)')
+  bx.fillStyle=gw;bx.beginPath();bx.arc(cx,cy,R*1.7*s,0,Math.PI*2);bx.fill()
+  /* outer 8 petals */
+  for(let i=0;i<8;i++) petal(cx,cy,(i/8)*Math.PI*2,R*s,R*.37*s,'rgba(255,228,238,.97)','rgba(225,110,148,.95)')
+  /* inner 8 petals */
+  for(let i=0;i<8;i++){
+    bx.save();bx.translate(cx,cy);bx.rotate((i/8)*Math.PI*2+Math.PI/8)
+    const g2=bx.createLinearGradient(0,0,0,R*.65*s)
+    g2.addColorStop(0,'rgba(255,242,250,.98)');g2.addColorStop(.45,'rgba(245,148,178,.95)');g2.addColorStop(1,'rgba(185,65,98,.9)')
+    bx.beginPath();bx.moveTo(0,2)
+    bx.bezierCurveTo( R*.24*s,R*.22*s, R*.22*s,R*.52*s, 0,R*.66*s)
+    bx.bezierCurveTo(-R*.22*s,R*.52*s,-R*.24*s,R*.22*s, 0,2)
+    bx.closePath();bx.fillStyle=g2;bx.fill();bx.restore()
+  }
+  /* gold centre */
+  const cg=bx.createRadialGradient(cx-R*.12*s,cy-R*.1*s,1,cx,cy,R*.32*s)
+  cg.addColorStop(0,'#fde68a');cg.addColorStop(.5,'#c8880a');cg.addColorStop(1,'#7a4800')
+  bx.beginPath();bx.arc(cx,cy,R*.31*s,0,Math.PI*2);bx.fillStyle=cg;bx.fill()
+  /* stamen ring */
+  bx.fillStyle='rgba(255,228,100,.9)'
+  for(let i=0;i<10;i++){
+    const a=(i/10)*Math.PI*2,dr=R*.2*s
+    bx.beginPath();bx.arc(cx+Math.cos(a)*dr,cy+Math.sin(a)*dr,1.6,0,Math.PI*2);bx.fill()
+  }
+  bx.beginPath();bx.arc(cx,cy,R*.1*s,0,Math.PI*2);bx.fillStyle='rgba(255,248,180,.95)';bx.fill()
+}
 
-function resizeS(){sc.width=window.innerWidth;sc.height=window.innerHeight;}
-resizeS(); window.addEventListener('resize',resizeS);
+function drawBoat(){
+  bx.clearRect(0,0,BW,BH)
+  const cx=BW/2,cy=BH/2
+  const rock=Math.sin(bT*.012)*0.038   /* gentle rock in radians */
 
-function drawStorm(){
-  sx.clearRect(0,0,sc.width,sc.height);
+  /* ── water shadow beneath hull ── */
+  const sh=bx.createRadialGradient(cx,BH-16,4,cx,BH-16,90)
+  sh.addColorStop(0,'rgba(10,70,70,.6)');sh.addColorStop(1,'rgba(10,70,70,0)')
+  bx.fillStyle=sh;bx.beginPath();bx.ellipse(cx,BH-16,82,18,0,0,Math.PI*2);bx.fill()
 
-  if(stormy){
-    sx.fillStyle='rgba(8,18,38,.48)'; sx.fillRect(0,0,sc.width,sc.height);
+  bx.save();bx.translate(cx,cy);bx.rotate(rock);bx.translate(-cx,-cy)
 
-    /* rain */
-    rain.forEach(d=>{
-      sx.beginPath(); sx.moveTo(d.x,d.y); sx.lineTo(d.x+d.len*.28,d.y+d.len);
-      sx.strokeStyle=`rgba(175,210,245,${d.al})`; sx.lineWidth=d.w; sx.stroke();
-      d.y+=d.sp; d.x+=d.sp*.28;
-      if(d.y>sc.height){d.y=-d.len;d.x=Math.random()*sc.width;}
-    });
+  /* ── hull outer rim ── */
+  const hOuter=bx.createRadialGradient(cx-12,cy-40,18,cx,cy,185)
+  hOuter.addColorStop(0,'#7a4a18');hOuter.addColorStop(.55,'#502c06');hOuter.addColorStop(1,'#200e02')
+  bx.beginPath()
+  bx.moveTo(cx,16)
+  bx.bezierCurveTo(cx+72,92,cx+74,368,cx,502)
+  bx.bezierCurveTo(cx-74,368,cx-72,92,cx,16)
+  bx.fillStyle=hOuter;bx.fill()
+  bx.strokeStyle='rgba(0,0,0,.55)';bx.lineWidth=2;bx.stroke()
 
-    /* storm waves */
-    for(let i=0;i<5;i++){
-      const yw=sc.height*(.18+i*.16)+Math.sin(sT*.05+i)*28;
-      sx.beginPath();
-      for(let x=0;x<sc.width;x+=4){
-        const y=yw+Math.sin(x*.022+sT*.07+i*1.3)*(14+i*5);
-        x===0?sx.moveTo(x,y):sx.lineTo(x,y);
-      }
-      sx.strokeStyle=`rgba(100,145,200,${.055+i*.01})`; sx.lineWidth=2; sx.stroke();
-    }
-  } else {
-    /* calm caustics */
-    for(let i=0;i<7;i++){
-      const yw=sc.height*(.1+i*.13)+Math.sin(sT*.007+i*1.6)*18;
-      const lg=sx.createLinearGradient(0,0,sc.width,0);
-      lg.addColorStop(0,'rgba(200,168,75,0)');
-      lg.addColorStop(.4,`rgba(200,168,75,${.022+i*.004})`);
-      lg.addColorStop(.6,`rgba(255,240,200,${.035+i*.004})`);
-      lg.addColorStop(1,'rgba(200,168,75,0)');
-      sx.beginPath();
-      for(let x=0;x<sc.width;x+=4){
-        const y=yw+Math.sin(x*.012+sT*.005+i)*4.5;
-        x===0?sx.moveTo(x,y):sx.lineTo(x,y);
-      }
-      sx.strokeStyle=lg; sx.lineWidth=1; sx.stroke();
-    }
-    if(Math.random()<.014) sRipples.push({x:Math.random()*sc.width,y:Math.random()*sc.height,r:0,a:.32});
+  /* ── hull interior wood ── */
+  const wood=bx.createLinearGradient(cx-62,0,cx+62,0)
+  wood.addColorStop(0,'#7a4818');wood.addColorStop(.18,'#9a6028')
+  wood.addColorStop(.5,'#bc7c3a');wood.addColorStop(.82,'#9a6028');wood.addColorStop(1,'#7a4818')
+  bx.beginPath()
+  bx.moveTo(cx,30)
+  bx.bezierCurveTo(cx+59,102,cx+61,368,cx,490)
+  bx.bezierCurveTo(cx-61,368,cx-59,102,cx,30)
+  bx.fillStyle=wood;bx.fill()
+
+  /* ── plank lines ── */
+  const planks=[
+    [cx,28,cx,488],[cx+14,30,cx+18,484],[cx-14,30,cx-18,484],
+    [cx+30,42,cx+36,472],[cx-30,42,cx-36,472],
+    [cx+46,60,cx+55,452],[cx-46,60,cx-55,452],
+  ]
+  planks.forEach(([x1,y1,x2,y2])=>{
+    const mx=(x1+x2)/2,my=(y1+y2)/2
+    bx.beginPath()
+    bx.moveTo(x1,y1)
+    bx.bezierCurveTo(mx+(x1-cx)*.05,my-40,mx+(x2-cx)*.05,my+40,x2,y2)
+    bx.strokeStyle='rgba(85,44,8,.42)';bx.lineWidth=1.1;bx.stroke()
+  })
+
+  /* ── specular rim highlight (left side, top-left light) ── */
+  bx.save()
+  const spec=bx.createLinearGradient(cx-75,80,cx-28,200)
+  spec.addColorStop(0,'rgba(255,215,140,.24)');spec.addColorStop(1,'rgba(255,215,140,0)')
+  bx.beginPath()
+  bx.moveTo(cx-28,50)
+  bx.bezierCurveTo(cx-70,105,cx-74,300,cx-46,462)
+  bx.strokeStyle=spec;bx.lineWidth=7;bx.lineCap='round';bx.stroke()
+  bx.restore()
+
+  /* ── lotus flowers ── */
+  lotus(cx,178,54,bT*.012)
+  lotus(cx,392,37,bT*.012+1.6)
+
+  /* ── figure silhouette ── */
+  const pY=290
+  /* robe */
+  const rg=bx.createRadialGradient(cx-9,pY-12,3,cx,pY,34)
+  rg.addColorStop(0,'#3c2275');rg.addColorStop(1,'#160840')
+  bx.beginPath()
+  bx.moveTo(cx-22,pY+14)
+  bx.bezierCurveTo(cx-28,pY-5,cx-22,pY-26,cx,pY-30)
+  bx.bezierCurveTo(cx+22,pY-26,cx+28,pY-5,cx+22,pY+14)
+  bx.bezierCurveTo(cx+16,pY+24,cx-16,pY+24,cx-22,pY+14)
+  bx.fillStyle=rg;bx.fill()
+  /* head */
+  const hg=bx.createRadialGradient(cx-4,pY-40,2,cx,pY-36,16)
+  hg.addColorStop(0,'#6a3c14');hg.addColorStop(1,'#3a1e06')
+  bx.beginPath();bx.ellipse(cx,pY-36,14,12,0,0,Math.PI*2);bx.fillStyle=hg;bx.fill()
+  /* hat brim */
+  bx.beginPath();bx.ellipse(cx,pY-39,21,8.5,0,0,Math.PI*2)
+  bx.fillStyle='rgba(26,12,3,.92)';bx.fill()
+  /* hat crown */
+  bx.beginPath();bx.ellipse(cx,pY-43,13,6,0,0,Math.PI*2)
+  bx.fillStyle='rgba(14,6,1,.96)';bx.fill()
+
+  /* ── paddles ── */
+  /* left shaft */
+  bx.beginPath();bx.moveTo(cx-21,pY+10)
+  bx.bezierCurveTo(cx-52,pY+24,cx-78,pY+46,cx-92,pY+62)
+  bx.strokeStyle='#7a4818';bx.lineWidth=5.5;bx.lineCap='round';bx.stroke()
+  /* left blade */
+  const bl=bx.createLinearGradient(cx-105,pY+60,cx-76,pY+78)
+  bl.addColorStop(0,'#9a6028');bl.addColorStop(1,'#6a3e10')
+  bx.beginPath();bx.ellipse(cx-96,pY+68,18,7.5,-.6,0,Math.PI*2);bx.fillStyle=bl;bx.fill()
+  /* right shaft */
+  bx.beginPath();bx.moveTo(cx+21,pY+10)
+  bx.bezierCurveTo(cx+52,pY+24,cx+78,pY+46,cx+92,pY+62)
+  bx.strokeStyle='#7a4818';bx.lineWidth=5.5;bx.lineCap='round';bx.stroke()
+  const br=bx.createLinearGradient(cx+76,pY+60,cx+105,pY+78)
+  br.addColorStop(0,'#6a3e10');br.addColorStop(1,'#9a6028')
+  bx.beginPath();bx.ellipse(cx+96,pY+68,18,7.5,.6,0,Math.PI*2);bx.fillStyle=br;bx.fill()
+
+  bx.restore()
+
+  /* ── expanding water rings outside rock transform ── */
+  const rph=bT*.012*.55
+  for(let i=0;i<4;i++){
+    const t=((rph+i*1.5)%6)/6
+    const ri=45+t*90,al=(1-t)*.2
+    bx.beginPath();bx.ellipse(cx,BH-14,ri,ri*.25,0,0,Math.PI*2)
+    bx.strokeStyle=`rgba(80,190,190,${al})`;bx.lineWidth=1.3;bx.stroke()
   }
 
-  sRipples=sRipples.filter(r=>r.a>.01);
-  sRipples.forEach(r=>{
-    sx.beginPath(); sx.arc(r.x,r.y,r.r,0,Math.PI*2);
-    sx.strokeStyle=`rgba(200,168,75,${r.a})`; sx.lineWidth=1; sx.stroke();
-    r.r+=1.3; r.a*=.968;
-  });
-
-  sT++; requestAnimationFrame(drawStorm);
+  bT++;requestAnimationFrame(drawBoat)
 }
-drawStorm();
+drawBoat()
 
-document.querySelector('.storm-sec').addEventListener('click',e=>{
-  if(!e.target.closest('.storm-inner'))
-    [0,8,20].forEach((r,i)=>sRipples.push({x:e.clientX,y:e.clientY,r,a:.6-i*.18}));
-});
+/* ── Scroll reveal ── */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.18})
+document.querySelectorAll('.card').forEach(c=>io.observe(c))
 
-/* ─── Weather toggle ─── */
-let ltInt=null;
-function toggleWeather(){
-  stormy=!stormy;
-  document.getElementById('togEl').classList.toggle('stormy',stormy);
-  document.getElementById('lCalm').classList.toggle('on',!stormy);
-  document.getElementById('lStorm').classList.toggle('on',stormy);
+/* ── Storm Canvas ── */
+const sc2=document.getElementById('sc'),sx=sc2.getContext('2d')
+let sT=0,stormy=false,rain=[],sRip=[],ltInt=null
 
+function resizeS(){sc2.width=innerWidth;sc2.height=innerHeight}
+resizeS();window.addEventListener('resize',resizeS)
+
+function stormLoop(){
+  sx.clearRect(0,0,sc2.width,sc2.height)
   if(stormy){
-    rain=Array.from({length:90},()=>({
-      x:Math.random()*sc.width, y:Math.random()*sc.height,
-      len:22+Math.random()*36, w:.7+Math.random()*.9,
-      sp:14+Math.random()*10, al:.3+Math.random()*.5,
-    }));
-    document.getElementById('sHead').innerHTML='The storm rages around you.<br><span class="g">Yet your boat holds firm.</span>';
-    document.getElementById('sMsg').textContent='Even now, you are not alone. The One who walks on water is right here with you.';
-
-    ltInt=setInterval(()=>{
-      const f=document.createElement('div');
-      f.style.cssText='position:fixed;inset:0;background:rgba(190,215,255,.07);pointer-events:none;z-index:100;animation:flashOut .35s ease forwards';
-      document.body.appendChild(f); setTimeout(()=>f.remove(),400);
-      for(let i=0;i<5;i++) setTimeout(()=>sRipples.push({x:Math.random()*sc.width,y:Math.random()*sc.height,r:0,a:.45}),i*70);
-    },2400+Math.random()*1800);
+    sx.fillStyle='rgba(6,14,34,.5)';sx.fillRect(0,0,sc2.width,sc2.height)
+    rain.forEach(d=>{
+      sx.beginPath();sx.moveTo(d.x,d.y);sx.lineTo(d.x+d.len*.3,d.y+d.len)
+      sx.strokeStyle=`rgba(170,205,245,${d.al})`;sx.lineWidth=d.w;sx.stroke()
+      d.y+=d.sp;d.x+=d.sp*.3
+      if(d.y>sc2.height){d.y=-d.len;d.x=Math.random()*sc2.width}
+    })
+    for(let i=0;i<5;i++){
+      const yw=sc2.height*(.14+i*.17)+Math.sin(sT*.055+i)*28
+      sx.beginPath()
+      for(let x=0;x<sc2.width;x+=4){
+        const y=yw+Math.sin(x*.022+sT*.072+i*1.35)*(13+i*5);x===0?sx.moveTo(x,y):sx.lineTo(x,y)
+      }
+      sx.strokeStyle=`rgba(90,135,195,${.05+i*.01})`;sx.lineWidth=2;sx.stroke()
+    }
   } else {
-    rain=[]; clearInterval(ltInt);
-    document.getElementById('sHead').innerHTML='The waters are still.<br><span class="g">Your faith holds the anchor.</span>';
-    document.getElementById('sMsg').textContent='Click the water to create ripples.';
-    for(let i=0;i<8;i++) setTimeout(()=>sRipples.push({
-      x:sc.width/2+(Math.random()-.5)*220, y:sc.height/2+(Math.random()-.5)*160, r:0,a:.5
-    }),i*70);
+    for(let i=0;i<8;i++){
+      const yw=sc2.height*(.07+i*.12)+Math.sin(sT*.007+i*1.6)*17
+      const lg=sx.createLinearGradient(0,0,sc2.width,0)
+      lg.addColorStop(0,'rgba(200,168,75,0)')
+      lg.addColorStop(.4,`rgba(200,168,75,${.018+i*.004})`)
+      lg.addColorStop(.6,`rgba(255,240,200,${.03+i*.004})`)
+      lg.addColorStop(1,'rgba(200,168,75,0)')
+      sx.beginPath()
+      for(let x=0;x<sc2.width;x+=4){
+        const y=yw+Math.sin(x*.012+sT*.005+i)*4;x===0?sx.moveTo(x,y):sx.lineTo(x,y)
+      }
+      sx.strokeStyle=lg;sx.lineWidth=1;sx.stroke()
+    }
+    if(Math.random()<.013)sRip.push({x:Math.random()*sc2.width,y:Math.random()*sc2.height,r:0,a:.28})
+  }
+  sRip=sRip.filter(r=>r.a>.01)
+  sRip.forEach(r=>{
+    sx.beginPath();sx.arc(r.x,r.y,r.r,0,Math.PI*2)
+    sx.strokeStyle=`rgba(200,168,75,${r.a})`;sx.lineWidth=1;sx.stroke()
+    r.r+=1.4;r.a*=.968
+  })
+  sT++;requestAnimationFrame(stormLoop)
+}
+stormLoop()
+
+function drawLightning(){
+  sx.save();sx.shadowBlur=20;sx.shadowColor='rgba(180,215,255,.85)'
+  function fork(x1,y1,x2,y2,depth){
+    if(depth===0){
+      sx.beginPath();sx.moveTo(x1,y1);sx.lineTo(x2,y2)
+      sx.strokeStyle=`rgba(215,230,255,${.6+depth*.1})`;sx.lineWidth=depth===0?1:1.5;sx.stroke();return
+    }
+    const mx=(x1+x2)/2+(Math.random()-.5)*55*(depth/3.5)
+    const my=(y1+y2)/2+(Math.random()-.5)*25
+    fork(x1,y1,mx,my,depth-1);fork(mx,my,x2,y2,depth-1)
+    if(depth>1&&Math.random()>.5){
+      const bx2=mx+(Math.random()-.5)*110,by2=my+50+Math.random()*80
+      const prev=sx.globalAlpha;sx.globalAlpha=.42;fork(mx,my,bx2,by2,depth-2);sx.globalAlpha=prev
+    }
+  }
+  fork(sc2.width*.2+Math.random()*sc2.width*.6,0,
+       sc2.width*.2+Math.random()*sc2.width*.6,sc2.height*.5+Math.random()*sc2.height*.25,3)
+  sx.restore()
+}
+
+document.getElementById('journey').addEventListener('click',e=>{
+  if(!e.target.closest('.storm-in'))
+    [0,8,20].forEach((r,i)=>sRip.push({x:e.clientX,y:e.clientY,r,a:.62-i*.18}))
+})
+
+function toggleW(){
+  stormy=!stormy
+  document.getElementById('tog').classList.toggle('s',stormy)
+  document.getElementById('lC').classList.toggle('on',!stormy)
+  document.getElementById('lS').classList.toggle('on',stormy)
+  if(stormy){
+    rain=Array.from({length:100},()=>({
+      x:Math.random()*sc2.width,y:Math.random()*sc2.height,
+      len:20+Math.random()*35,w:.7+Math.random()*.9,sp:13+Math.random()*10,al:.25+Math.random()*.5
+    }))
+    document.getElementById('sh').innerHTML='The storm rages around you.<br><span class="g">Yet your boat holds firm.</span>'
+    document.getElementById('sm').textContent='Even now, you are not alone. The One who walks on water is right here.'
+    ltInt=setInterval(()=>{
+      drawLightning()
+      const f=document.createElement('div')
+      f.style.cssText='position:fixed;inset:0;background:rgba(180,210,255,.06);pointer-events:none;z-index:50;animation:flashOut .4s ease forwards'
+      document.body.appendChild(f);setTimeout(()=>f.remove(),460)
+      for(let i=0;i<5;i++) setTimeout(()=>sRip.push({x:Math.random()*sc2.width,y:Math.random()*sc2.height,r:0,a:.42}),i*65)
+    },2600+Math.random()*1800)
+  } else {
+    rain=[];clearInterval(ltInt)
+    document.getElementById('sh').innerHTML='The waters are still.<br><span class="g">Your faith holds the anchor.</span>'
+    document.getElementById('sm').textContent='Click the water to create ripples.'
+    for(let i=0;i<8;i++) setTimeout(()=>sRip.push({
+      x:sc2.width/2+(Math.random()-.5)*220,y:sc2.height/2+(Math.random()-.5)*160,r:0,a:.5
+    }),i*68)
   }
 }
 </script>
