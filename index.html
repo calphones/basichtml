@@ -19,7 +19,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{background:var(--bg1);color:var(--cr);font-family:var(--s);overflow-x:hidden;cursor:none}
-    .cur,.cur-r{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+    .cur,.cur-r{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);left:-100px;top:-100px}
     .cur{width:8px;height:8px;background:var(--gold);mix-blend-mode:screen}
     .cur-r{width:32px;height:32px;border:1px solid rgba(200,168,75,.45)}
     @media(hover:none){.cur,.cur-r{display:none}body{cursor:auto}}
@@ -52,7 +52,7 @@
     .hero-in{position:relative;z-index:2;text-align:center;padding:0 clamp(28px,8vw,100px);max-width:860px;will-change:transform}
     .eyebrow{font-family:var(--d);font-size:clamp(.56rem,1vw,.7rem);letter-spacing:.38em;text-transform:uppercase;color:var(--gold);opacity:0;animation:up 1s ease .5s both}
     .hq{margin-top:28px;font-size:clamp(1.85rem,4.4vw,4rem);font-weight:300;font-style:italic;line-height:1.5;color:var(--cr)}
-    .ql{display:block;opacity:0;transform:translateY(16px);animation:up .9s ease var(--dl) both}
+    .ql{display:block;opacity:0;transform:translateY(16px);animation-name:up;animation-duration:.9s;animation-timing-function:ease;animation-fill-mode:both;animation-delay:var(--dl,1s)}
     .hq mark{color:var(--glt);background:transparent;font-weight:400;font-style:italic}
     .hq strong{color:#fff;font-weight:400;font-style:italic}
     .rule{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:32px auto;opacity:0;animation:up 1s ease 2s both}
@@ -70,7 +70,7 @@
     }
     .boat-lbl{font-family:var(--d);font-size:clamp(.56rem,.95vw,.68rem);letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
     #bc{
-      width:min(260px,54vw);display:block;
+      width:min(260px,54vw);height:min(422px,62vh);display:block;
       filter:drop-shadow(0 28px 55px rgba(0,0,0,.68)) drop-shadow(0 6px 18px rgba(0,80,60,.45));
     }
     .boat-cap{font-size:clamp(.92rem,1.6vw,1.18rem);font-weight:300;font-style:italic;color:var(--cr6);text-align:center;max-width:310px;line-height:1.82}
@@ -226,12 +226,12 @@
 <script>
 /* ── Cursor ── */
 const $cur=document.getElementById('cur'),$curR=document.getElementById('curR')
-let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my
+let mx=-100,my=-100,rx=-100,ry=-100
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
 ;(function aC(){
-  $cur.style.cssText+=`;left:${mx}px;top:${my}px`
-  rx+=(mx-rx)*.1;ry+=(my-ry)*.1
-  $curR.style.cssText+=`;left:${rx}px;top:${ry}px`
+  $cur.style.left=mx+'px'; $cur.style.top=my+'px'
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1
+  $curR.style.left=rx+'px'; $curR.style.top=ry+'px'
   requestAnimationFrame(aC)
 })()
 
@@ -302,7 +302,7 @@ function heroLoop(){
     }
     r.r+=1.7+r.r*.02;r.a*=.963
   })
-  document.getElementById('heroIn').style.transform=`translate(${hpx*.22}px,${hpy*.14}px)`
+  const hi=document.getElementById('heroIn');hi.style.transform=`translate(${hpx*.22}px,${hpy*.14}px)`
   hT++;requestAnimationFrame(heroLoop)
 }
 heroLoop()
